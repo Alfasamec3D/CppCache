@@ -1,0 +1,4 @@
+/mnt/windows/media/programs/CppCache/build/CMakeFiles/main.dir
+/mnt/windows/media/programs/CppCache/build/CMakeFiles/test.dir
+/mnt/windows/media/programs/CppCache/build/CMakeFiles/edit_cache.dir
+/mnt/windows/media/programs/CppCache/build/CMakeFiles/rebuild_cache.dir
