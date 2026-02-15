@@ -54,6 +54,7 @@ class Cache_IDEAL {
 
   int run(const std::vector<T>& inputs);
 };
-void run_program();
+void run_LFU();
+void run_IDEAL();
 }  // namespace Cache
 #endif

@@ -134,39 +134,48 @@ int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
   }
   return hitsCount;
 }
-void run_program() {
+
+void run_LFU() {
   size_t cacheCapacity;
   int elementsQuantity;
-
-  std::cout << "Input cache capacity:" << std::endl;
+  int element;
+  int hitsCount = 0;
 
   std::cin >> cacheCapacity;
 
-  std::cout << std::endl << "Input quantity of the elements:" << std::endl;
-
   std::cin >> elementsQuantity;
 
-  std::cout << std::endl << "Input the elements: " << std::endl;
-
   Cache::Cache_LFU<int> cache{cacheCapacity};
-  Cache::Cache_IDEAL<int> ideal_cache{cacheCapacity};
-  int element;
-  int hitsCount = 0;
-  std::vector<int> input_data;
 
   for (int i = 0; i <= elementsQuantity - 1; ++i) {
     std::cin >> element;
-    input_data.push_back(element);
     hitsCount += cache.require(element);
 #ifndef NDEBUG
     std::cout << std::endl << "I counted " << hitsCount << " hits" << std::endl;
 #endif
   }
 
-  std::cout << std::endl << "Number of hits is: ";
-  std::cout << std::endl << hitsCount;
+  std::cout << std::endl << hitsCount << std::endl;
+}
 
-  std::cout << std::endl << "Number of hits for ideal cache is: ";
-  std::cout << std::endl << ideal_cache.run(input_data) << std::endl;
+void run_IDEAL() {
+  size_t cacheCapacity;
+  int elementsQuantity;
+  int element;
+  int hitsCount = 0;
+  std::vector<int> input_elem;
+
+  std::cin >> cacheCapacity;
+
+  std::cin >> elementsQuantity;
+
+  Cache::Cache_IDEAL<int> cache{cacheCapacity};
+
+  for (int i = 0; i <= elementsQuantity - 1; ++i) {
+    std::cin >> element;
+    input_elem.push_back(element);
+  }
+
+  std::cout << std::endl << cache.run(input_elem) << std::endl;
 }
 }  // namespace Cache

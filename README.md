@@ -25,3 +25,8 @@ This program simulates LFU cache.
 
 1. In the same directory enter `./main` command.
 2. Enjoy the program.
+
+## How to launch Ideal cache
+
+1. In the same directory enter `./cacheIdeal` command.
+2. Enjoy the program.
