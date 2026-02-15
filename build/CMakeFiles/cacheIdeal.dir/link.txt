@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/cacheIdeal.dir/link.d CMakeFiles/cacheIdeal.dir/src/cache_ideal.cpp.o -o cacheIdeal  libcache.a
