@@ -1,6 +1,5 @@
 # LFU Cache
 
-
 This program simulates LFU cache.
 
 ## How to build
@@ -21,12 +20,12 @@ This program simulates LFU cache.
 2. In terminal use `make test` command.
 3. See the results of the test.
 
-## How to launch
+## How to run
 
 1. In the same directory enter `./main` command.
 2. Enjoy the program.
 
-## How to launch Ideal cache
+## How to run Ideal cache
 
 1. In the same directory enter `./cacheIdeal` command.
 2. Enjoy the program.

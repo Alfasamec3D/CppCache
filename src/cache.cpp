@@ -22,9 +22,6 @@ bool Cache_LFU<T>::require(T input) {
     freqHash_[inputIterator->freq].splice(freqHash_[inputIterator->freq].end(),
                                           freqHash_[inputIterator->freq - 1],
                                           inputIterator);
-#ifndef NDEBUG
-    std::cout << std::endl << "Бро, попадание " << input;
-#endif
     return true;
   } else {
     //If required object is not in cache
@@ -32,31 +29,17 @@ bool Cache_LFU<T>::require(T input) {
     // if cache is full
     if (sz_ == capacity_) {
 // Delete object with minimal frequency
-#ifndef NDEBUG
-      std::cout << std::endl
-                << "Бро, удаляю " << freqHash_[minFreq].front().object_;
-#endif
       cacheHash_.erase(freqHash_[minFreq].front().object_);
       freqHash_[minFreq].pop_front();
       --sz_;
     }
-#ifndef NDEBUG
-    std::cout << std::endl << "Бро, размер " << sz_;
-#endif
     // Add required element to a list of objects with frequency 1
     freqHash_[1].push_back({input, 1});
     ++sz_;
-#ifndef NDEBUG
-    std::cout << std::endl << "Бро, добавляю " << input;
-#endif
     // Minimal frequency is 1 again
     minFreq = 1;
 
     cacheHash_[input] = --(freqHash_[1].end());
-
-#ifndef NDEBUG
-    std::cout << std::endl << "Бро, размер " << sz_;
-#endif
 
     return false;
   }
@@ -81,9 +64,7 @@ void Cache_IDEAL<T>::delete_latest_elem(
       deleteIterator = cacheIterator;
     }
   }
-#ifndef NDEBUG
-  std::cout << std::endl << "Erased " << *deleteIterator << std::endl;
-#endif
+
   cache_.erase(deleteIterator);
 }
 
@@ -110,24 +91,18 @@ int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
             deleteIterator = cacheIterator;
           }
         }
-#ifndef NDEBUG
-        std::cout << std::endl << "Erased " << *deleteIterator << std::endl;
-#endif
+
         cache_.erase(deleteIterator);
       }
 
       // Now there is space in cache
       cache_.insert(*inputIterator);
-#ifndef NDEBUG
-      std::cout << std::endl << "Inserted " << *inputIterator << std::endl;
-#endif
+
     }
 
     else {
 // The element is in cache
-#ifndef NDEBUG
-      std::cout << std::endl << *inputIterator << " is in cache" << std::endl;
-#endif
+
       ++hitsCount;
     }
   }
@@ -149,12 +124,10 @@ void run_LFU() {
   for (int i = 0; i <= elementsQuantity - 1; ++i) {
     std::cin >> element;
     hitsCount += cache.require(element);
-#ifndef NDEBUG
-    std::cout << std::endl << "I counted " << hitsCount << " hits" << std::endl;
-#endif
+
   }
 
-  std::cout << std::endl << hitsCount << std::endl;
+  std::cout << hitsCount << std::endl;
 }
 
 void run_IDEAL() {
@@ -175,6 +148,6 @@ void run_IDEAL() {
     input_elem.push_back(element);
   }
 
-  std::cout << std::endl << cache.run(input_elem) << std::endl;
+  std::cout << cache.run(input_elem) << std::endl;
 }
 }  // namespace Cache
