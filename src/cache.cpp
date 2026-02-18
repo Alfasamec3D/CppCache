@@ -4,21 +4,21 @@ namespace Cache {
 
 template <typename T>
 bool Cache_LFU<T>::require(T input) {
-  // Если запрашиваемый объект уже в кэше
+  // if required object is already in cache
   if (cacheHash_.find(input) != cacheHash_.end()) {
-    // Итератор на входной объект в кэше
+    // Oterator to the input object in cache
     const auto inputIterator = cacheHash_[input];
 
-    // Если частота объекта наименьшая в кэшэ и он единственный с такой
-    // частотой, то минимальная частота увеличивается на 1
+    // if frequency of the object is minimal and it is the only one with such
+    // frequency, then minimal frequency increases by 1
     if ((inputIterator->freq == minFreq) && (freqHash_[minFreq].size() == 1)) {
       ++minFreq;
     }
 
-    // Увеличаем частотную характеристику
+    // increase frequency
     ++(inputIterator->freq);
 
-    // Смещаем объект в область списка соответствующего числа обращений
+    // Move object to area of matching frequency
     freqHash_[inputIterator->freq].splice(freqHash_[inputIterator->freq].end(),
                                           freqHash_[inputIterator->freq - 1],
                                           inputIterator);
@@ -27,11 +27,11 @@ bool Cache_LFU<T>::require(T input) {
 #endif
     return true;
   } else {
-    // Если запрашиваемого объекта нет в кэше
+    //If required object is not in cache
 
-    // Если кэш заполнен
+    // if cache is full
     if (sz_ == capacity_) {
-// Удаляем объект с наименьшей частотой
+// Delete object with minimal frequency
 #ifndef NDEBUG
       std::cout << std::endl
                 << "Бро, удаляю " << freqHash_[minFreq].front().object_;
@@ -43,13 +43,13 @@ bool Cache_LFU<T>::require(T input) {
 #ifndef NDEBUG
     std::cout << std::endl << "Бро, размер " << sz_;
 #endif
-    // Добавляем в список объектов с частотой 1 запрошенный элемент
+    // Add required element to a list of objects with frequency 1
     freqHash_[1].push_back({input, 1});
     ++sz_;
 #ifndef NDEBUG
     std::cout << std::endl << "Бро, добавляю " << input;
 #endif
-    // Минимальная частота снова 1
+    // Minimal frequency is 1 again
     minFreq = 1;
 
     cacheHash_[input] = --(freqHash_[1].end());
@@ -92,16 +92,15 @@ int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
   int hitsCount = 0;
   for (auto inputIterator = inputs.begin(); inputIterator != inputs.end();
        ++inputIterator) {
-    // Если входного элемента нет в Кэше
+    // the inout element is in cache
     if (cache_.find(*inputIterator) == cache_.end()) {
-      // Если кэш заполнен
+      // if cache is full
       if (cache_.size() == capacity_) {
         size_t max_distance{0};
         size_t distance;
         auto deleteIterator = cache_.begin();
         for (auto cacheIterator = cache_.begin(); cacheIterator != cache_.end();
              ++cacheIterator) {
-          //
           distance = std::distance(
               inputIterator, std::find(std::next(inputIterator), inputs.end(),
                                        *cacheIterator));
@@ -117,7 +116,7 @@ int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
         cache_.erase(deleteIterator);
       }
 
-      // Теперь в кэше есть место
+      // Now there is space in cache
       cache_.insert(*inputIterator);
 #ifndef NDEBUG
       std::cout << std::endl << "Inserted " << *inputIterator << std::endl;
@@ -125,7 +124,7 @@ int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
     }
 
     else {
-// Если элемент есть в кэше
+// The element is in cache
 #ifndef NDEBUG
       std::cout << std::endl << *inputIterator << " is in cache" << std::endl;
 #endif

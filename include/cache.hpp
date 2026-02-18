@@ -19,23 +19,23 @@ class Cache_LFU {
   };
 
  private:
-  // Число элементов в кэше
+  // number of elements in cache
   size_t sz_ = 0;
-  // Ёмкоть кэша
+  // cache capacity
   size_t capacity_;
-  // Минимальное число вызовов среди элементов кэша
+  // minimal times of callings among cache elements
   int minFreq;
 
-  // Хэш таблица с указателями на объекты в кэше
+  //  hash table wit pointers to objects in cache
   std::unordered_map<T, typename std::list<Object_freq_>::iterator> cacheHash_;
-  // Хэш таблица соответсвтвия числп вызовов и элементов
+  // hash table, matching times of callings and elements
   std::unordered_map<int, std::list<Object_freq_>> freqHash_;
 
  public:
-  // Конструктор
+  // constructor
   Cache_LFU(size_t capacity) : capacity_(capacity) {};
 
-  // Функция-интерфейс
+  // function-interface
   bool require(T input);
 };
 
