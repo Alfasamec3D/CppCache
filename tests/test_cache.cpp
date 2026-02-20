@@ -4,7 +4,7 @@
 #include "cache.hpp"
 bool TestCache(std::string& file_path) {
   std::ifstream file(file_path);
-  int x;
+  size_t x;
   int el_quantity;
   std::vector<int> input_data;
   int hitsCount;
