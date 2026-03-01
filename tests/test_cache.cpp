@@ -1,17 +1,22 @@
+#include <gtest/gtest.h>
+
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include "cache.hpp"
-bool TestCache(std::string& file_path) {
-  std::ifstream file(file_path);
+TEST(CacheTest, BasicScenario) {
+  std::ifstream file("tests/tests.txt");
+  ASSERT_TRUE(file.is_open()) << "Cannot open tests.txt";
+
   size_t x;
   int el_quantity;
   std::vector<int> input_data;
   int hitsCount;
 
   while (file >> x) {
-    Cache::Cache_LFU<int> cache{x};
-    Cache::Cache_IDEAL<int> ideal_cache{x};
+    size_t capacity = x;
+    Cache::Cache_LFU<int> cache{capacity};
 
     file >> el_quantity;
     hitsCount = 0;
@@ -24,22 +29,9 @@ bool TestCache(std::string& file_path) {
     }
 
     file >> x;
-    if (hitsCount != x) {
-      return false;
-    }
+    EXPECT_EQ(hitsCount, x);
 
     file >> x;
-    if (ideal_cache.run(input_data) != x) {
-      return false;
-    }
+    EXPECT_EQ(Cache::runIDEAL(capacity, input_data), x);
   }
-  return true;
-}
-
-int main() {
-  std::string test_path{"tests.txt"};
-  if (TestCache(test_path)) {
-    return 0;
-  };
-  return 1;
 }

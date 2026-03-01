@@ -4,6 +4,8 @@ project("CACHE")
 
 enable_testing()
 
+find_package(GTest REQUIRED)
+
 add_executable(main main.cpp)
 
 add_executable(test_cache tests/test_cache.cpp)
@@ -16,7 +18,7 @@ include_directories("include")
 
 target_link_libraries (main cache)
 
-target_link_libraries (test_cache cache)
+target_link_libraries (test_cache cache gtest gtest_main)
 target_link_libraries (cacheIdeal cache)
 
-add_test(NAME Test_cache COMMAND test_cache)
+add_test(NAME CacheTest COMMAND test_cache)

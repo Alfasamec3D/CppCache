@@ -1,5 +1,9 @@
 #include "cache.hpp"
 
+#include <limits>
+#include <queue>
+#include <set>
+
 namespace Cache {
 
 template <typename T>
@@ -24,11 +28,11 @@ bool Cache_LFU<T>::require(T input) {
                                           inputIterator);
     return true;
   } else {
-    //If required object is not in cache
+    // If required object is not in cache
 
     // if cache is full
     if (sz_ == capacity_) {
-// Delete object with minimal frequency
+      // Delete object with minimal frequency
       cacheHash_.erase(freqHash_[minFreq].front().object_);
       freqHash_[minFreq].pop_front();
       --sz_;
@@ -46,67 +50,47 @@ bool Cache_LFU<T>::require(T input) {
 }
 
 template <typename T>
-void Cache_IDEAL<T>::delete_latest_elem(
-    const std::vector<T>& inputs,
-    const typename std::vector<T>::iterator& inputIterator) {
-  size_t max_distance{0};
-  size_t distance;
-  auto deleteIterator = cache_.begin();
-  for (auto cacheIterator = cache_.begin(); cacheIterator != cache_.end();
-       ++cacheIterator) {
-    //
-    distance = std::distance(
-        inputIterator,
-        std::find(std::next(inputIterator), inputs.end(), *cacheIterator));
+int runIDEAL(const size_t& capacity, const std::vector<T>& inputs) {
+  const size_t INF = std::numeric_limits<size_t>::max();
 
-    if (max_distance < distance) {
-      max_distance = distance;
-      deleteIterator = cacheIterator;
-    }
-  }
+  int hits = 0;
 
-  cache_.erase(deleteIterator);
-}
+  std::unordered_map<T, std::queue<size_t>> future;
 
-template <typename T>
-int Cache_IDEAL<T>::run(const std::vector<T>& inputs) {
-  int hitsCount = 0;
-  for (auto inputIterator = inputs.begin(); inputIterator != inputs.end();
-       ++inputIterator) {
-    // the inout element is in cache
-    if (cache_.find(*inputIterator) == cache_.end()) {
-      // if cache is full
-      if (cache_.size() == capacity_) {
-        size_t max_distance{0};
-        size_t distance;
-        auto deleteIterator = cache_.begin();
-        for (auto cacheIterator = cache_.begin(); cacheIterator != cache_.end();
-             ++cacheIterator) {
-          distance = std::distance(
-              inputIterator, std::find(std::next(inputIterator), inputs.end(),
-                                       *cacheIterator));
+  for (size_t i = 0; i < inputs.size(); ++i) future[inputs[i]].push(i);
 
-          if (max_distance < distance) {
-            max_distance = distance;
-            deleteIterator = cacheIterator;
-          }
-        }
+  std::unordered_set<T> cache;
+  std::set<std::pair<size_t, T>> order;
+  std::unordered_map<T, size_t> next_use_map;
 
-        cache_.erase(deleteIterator);
+  for (size_t i = 0; i < inputs.size(); ++i) {
+    T value = inputs[i];
+
+    future[value].pop();
+
+    size_t next_use = future[value].empty() ? std::numeric_limits<size_t>::max()
+                                            : future[value].front();
+
+    if (cache.count(value)) {
+      ++hits;
+
+      order.erase({next_use_map[value], value});
+    } else {
+      if (cache.size() == capacity) {
+        auto it = std::prev(order.end());
+        cache.erase(it->second);
+        next_use_map.erase(it->second);
+        order.erase(it);
       }
 
-      // Now there is space in cache
-      cache_.insert(*inputIterator);
-
+      cache.insert(value);
     }
 
-    else {
-// The element is in cache
-
-      ++hitsCount;
-    }
+    next_use_map[value] = next_use;
+    order.insert({next_use, value});
   }
-  return hitsCount;
+
+  return hits;
 }
 
 void run_LFU() {
@@ -124,7 +108,6 @@ void run_LFU() {
   for (int i = 0; i <= elementsQuantity - 1; ++i) {
     std::cin >> element;
     hitsCount += cache.require(element);
-
   }
 
   std::cout << hitsCount << std::endl;
@@ -141,13 +124,11 @@ void run_IDEAL() {
 
   std::cin >> elementsQuantity;
 
-  Cache::Cache_IDEAL<int> cache{cacheCapacity};
-
   for (int i = 0; i <= elementsQuantity - 1; ++i) {
     std::cin >> element;
     input_elem.push_back(element);
   }
 
-  std::cout << cache.run(input_elem) << std::endl;
+  std::cout << runIDEAL(cacheCapacity, input_elem) << std::endl;
 }
 }  // namespace Cache

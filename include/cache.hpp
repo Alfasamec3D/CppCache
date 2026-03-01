@@ -11,7 +11,6 @@
 namespace Cache {
 
 template <typename T>
-
 class Cache_LFU {
   struct Object_freq_ {
     T object_;
@@ -40,20 +39,8 @@ class Cache_LFU {
 };
 
 template <typename T>
-class Cache_IDEAL {
- private:
-  size_t capacity_;
-  std::unordered_set<T> cache_;
+int runIDEAL(const size_t& capacity, const std::vector<T>& inputs);
 
-  void delete_latest_elem(
-      const std::vector<T>& inputs,
-      const typename std::vector<T>::iterator& inputIterator);
-
- public:
-  Cache_IDEAL(size_t capacity) : capacity_(capacity) {};
-
-  int run(const std::vector<T>& inputs);
-};
 void run_LFU();
 void run_IDEAL();
 }  // namespace Cache

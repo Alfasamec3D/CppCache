@@ -12,20 +12,19 @@ This program simulates LFU cache.
 
    command.
    
-5. Wait till the building is finished.
+4. Wait till the building is finished.
 
 ## How to test
 
-1. Go to the build tree directory
-2. In terminal use `make test` command.
-3. See the results of the test.
+1. In terminal use `build/tests` command.
+2. See the results of the test.
 
 ## How to run
 
-1. In the same directory enter `./main` command.
+1. In the same directory use `build/main` command.
 2. Enjoy the program.
 
 ## How to run Ideal cache
 
-1. In the same directory enter `./cacheIdeal` command.
+1. In the same directory enter `build/cacheIdeal` command.
 2. Enjoy the program.
