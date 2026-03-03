@@ -51,8 +51,6 @@ bool Cache_LFU<T>::require(T input) {
 
 template <typename T>
 int runIDEAL(const size_t& capacity, const std::vector<T>& inputs) {
-  const size_t INF = std::numeric_limits<size_t>::max();
-
   int hits = 0;
 
   std::unordered_map<T, std::queue<size_t>> future;
@@ -70,24 +68,40 @@ int runIDEAL(const size_t& capacity, const std::vector<T>& inputs) {
 
     size_t next_use = future[value].empty() ? std::numeric_limits<size_t>::max()
                                             : future[value].front();
-
+    // If object is in cache
     if (cache.count(value)) {
       ++hits;
 
       order.erase({next_use_map[value], value});
-    } else {
-      if (cache.size() == capacity) {
-        auto it = std::prev(order.end());
-        cache.erase(it->second);
-        next_use_map.erase(it->second);
-        order.erase(it);
-      }
-
-      cache.insert(value);
+      next_use_map[value] = next_use;
+      order.insert({next_use, value});
     }
+    // If object not in cache
+    else {
+      // If there is free space in cache
+      if (cache.size() < capacity) {
+        cache.insert(value);
+        next_use_map[value] = next_use;
+        order.insert({next_use, value});
+      }
+      // if there is no free space in cache and next use of insert value is
+      // closer than farthest next use of objects in cache
+      else {
+        auto it = std::prev(order.end());
+        if (next_use < it->first) {
+          cache.erase(it->second);
+          next_use_map.erase(it->second);
+          order.erase(it);
 
-    next_use_map[value] = next_use;
-    order.insert({next_use, value});
+          cache.insert(value);
+          next_use_map[value] = next_use;
+          order.insert({next_use, value});
+        }
+      }
+      // if there is no free space in cache and next use of insert value is
+      // farther than farthest next use of objects in cache which just go to the
+      // next insert value
+    }
   }
 
   return hits;
