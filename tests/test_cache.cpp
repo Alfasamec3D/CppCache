@@ -25,7 +25,7 @@ TEST(CacheTest, BasicScenario) {
     for (int i = 0; i <= el_quantity - 1; ++i) {
       file >> x;
       input_data.push_back(x);
-      hitsCount += cache.require(x);
+      hitsCount += cache.lookup_update(x);
     }
 
     file >> x;
