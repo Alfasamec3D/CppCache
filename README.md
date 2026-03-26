@@ -16,7 +16,7 @@ This program simulates LFU cache.
 
 ## How to test
 
-1. In terminal use `build/test_cache` command.
+1. In terminal use `ctest --test-dir build/tests` command.
 2. See the results of the test.
 
 ## How to run
