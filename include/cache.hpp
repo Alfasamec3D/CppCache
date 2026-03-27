@@ -3,13 +3,15 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <list>
+#include <queue>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 namespace Cache {
-
 
 template <typename T, typename KeyT = int>
 struct Page {
@@ -21,8 +23,7 @@ struct Page {
   T* content_ = nullptr;
 };
 
-
-//function for getting page slow
+// function for getting page slow
 template <typename T, typename KeyT = int>
 Page<T, KeyT> slow_get_page_t(const KeyT& key) {
   return Page<T, KeyT>{key};
@@ -54,8 +55,8 @@ class Cache_LFU {
   Cache_LFU(size_t capacity) : capacity_(capacity) {};
 
   // function-interface
-  bool lookup_update(const KeyT& key,
-                     Page<T, KeyT> (*slow_get_page)(const KeyT&)=slow_get_page_t<int>) {
+  bool lookup_update(const KeyT& key, Page<T, KeyT> (*slow_get_page)(
+                                          const KeyT&) = slow_get_page_t<int>) {
     // if required object is already in cache
     if (cacheHash_.find(key) != cacheHash_.end()) {
       // Iterator to the requested page in cache
@@ -100,8 +101,77 @@ class Cache_LFU {
   }
 };
 
-template <typename T>
-int runIDEAL(const size_t& capacity, const std::vector<T>& inputs);
+template <typename T, typename KeyT = int>
+class Cache_Ideal {
+ private:
+  size_t capacity_;
+  std::list<Page<T, KeyT>> cache_;
+  std::unordered_map<KeyT, typename std::list<Page<T, KeyT>>::iterator>
+      cache_keys_;
+  std::set<std::pair<size_t, KeyT>> order_;
+  std::unordered_map<KeyT, size_t> next_use_map_;
+
+ public:
+  Cache_Ideal(const size_t& capacity) : capacity_(capacity) {};
+
+  int lookup_update_list(
+      const std::vector<T>& keys,
+      Page<T, KeyT> (*slow_get_page)(const KeyT&) = slow_get_page_t<int>) {
+    int hits = 0;
+
+    std::unordered_map<KeyT, std::queue<size_t>> future;
+
+    for (size_t i = 0; i < keys.size(); ++i) future[keys[i]].push(i);
+
+    for (size_t i = 0; i < keys.size(); ++i) {
+      KeyT key = keys[i];
+
+      future[key].pop();
+
+      size_t next_use = future[key].empty() ? std::numeric_limits<size_t>::max()
+                                            : future[key].front();
+      // If object is in cache
+      if (cache_keys_.find(key) != cache_keys_.end()) {
+        ++hits;
+
+        order_.erase({next_use_map_[key], key});
+        next_use_map_[key] = next_use;
+        order_.insert({next_use, key});
+      }
+      // If object not in cache
+      else {
+        // If there is free space in cache
+        if (cache_.size() < capacity_) {
+          cache_.push_back(slow_get_page(key));
+          cache_keys_[key] = --cache_.end();
+          next_use_map_[key] = next_use;
+          order_.insert({next_use, key});
+        }
+        // if there is no free space in cache and next use of insert key is
+        // closer than farthest next use of objects in cache
+        else {
+          auto it = std::prev(order_.end());
+          if (next_use < it->first) {
+            cache_.erase(cache_keys_[it->second]);
+            cache_keys_.erase(it->second);
+            next_use_map_.erase(it->second);
+            order_.erase(it);
+
+            cache_.push_back(slow_get_page(key));
+            cache_keys_[key] = --cache_.end();
+            next_use_map_[key] = next_use;
+            order_.insert({next_use, key});
+          }
+        }
+        // if there is no free space in cache and next use of insert key is
+        // farther than farthest next use of objects in cache just go to
+        // the next insert key
+      }
+    }
+
+    return hits;
+  }
+};
 
 void run_LFU();
 void run_IDEAL();
